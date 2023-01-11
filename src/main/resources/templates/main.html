@@ -2,9 +2,30 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Home page</title>
+    <title>Список сообщений</title>
 </head>
 <body>
-<p th:text="'Home page.'" />
+<div th:if="${messages.isEmpty()}">
+    <hr/>
+    <p>Человек пока ничего не написал</p>
+    <hr/>
+</div>
+
+<div th:if="${!messages.isEmpty()}">
+    <hr/>
+    <b>Сообщения:</b>
+    <br/>
+    <table th:each="message : ${messages}">
+        <a th:text="${message.getId()}">id</a>
+        <br/>
+        <a th:text="${message.getText()}">text</a>
+        <br/>
+        <a th:text="${message.getTag()}">tag</a>
+    </table>
+
+
+    <hr/>
+</div>
+
 </body>
 </html>
