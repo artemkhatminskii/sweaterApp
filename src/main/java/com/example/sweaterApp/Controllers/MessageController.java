@@ -9,27 +9,26 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-public class greetingController {
+public class MessageController {
 
     private final MessageRepository messageRepository;
 
     @Autowired
-    public greetingController(MessageRepository messageRepository) {
+    public MessageController(MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
     }
 
 
-    @GetMapping("/greeting")
+    @GetMapping("/")
     public String greeting(@RequestParam(name = "name", required = false,
             defaultValue = "World") String name, Model model) {
         model.addAttribute("name", name);
         return "greeting";
     }
 
-    @GetMapping("/")
+    @GetMapping("/main")
     public String main(Model model) {
-        Iterable<Message> messages = messageRepository.findAll();
-        model.addAttribute("messages", messages);
+        model.addAttribute("messages", messageRepository.findAll());
         return "main";
     }
 
@@ -37,7 +36,8 @@ public class greetingController {
     public String addMessage(@ModelAttribute("message") Message message) {
         return "newMessage";
     }
-    @PostMapping("/")
+
+    @PostMapping("/new_message")
     public String newMessage(@ModelAttribute("message") Message message,
                              BindingResult bindingResult) {
 
@@ -45,6 +45,14 @@ public class greetingController {
 
         messageRepository.save(message);
 
-        return "redirect:/";
+        return "redirect:/main";
+    }
+
+    @PostMapping("/filter")
+    public String filter(@RequestParam String tag, Model model) {
+        if (tag != null && !tag.isBlank())
+        model.addAttribute("messages", messageRepository.findByTag(tag));
+        else model.addAttribute("messages", messageRepository.findAll());
+        return "main";
     }
 }

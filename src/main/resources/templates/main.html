@@ -5,6 +5,14 @@
     <title>Список сообщений</title>
 </head>
 <body>
+
+<form th:method="POST" th:action="@{/filter}">
+    <label for="tag" >Укажите тэг:</label>
+    <input type="text" id="tag" name="tag"/>
+    <br/>
+    <input type="submit" value="Поиск">
+</form>
+
 <div th:if="${messages.isEmpty()}">
     <hr/>
     <p>Человек пока ничего не написал</p>
@@ -23,9 +31,10 @@
         <a th:text="${message.getTag()}">tag</a>
     </table>
 
-
     <hr/>
 </div>
+
+<a href="/new_message">Добавить новое сообщение</a>
 
 </body>
 </html>
