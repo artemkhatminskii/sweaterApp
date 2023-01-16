@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>Редактирование пользователя</title>
+</head>
+<body>
+Пользователь:
+
+<form th:action="@{/user/{usr_id}(usr_id=${usr.getId()})}" th:method="post">
+  <input type="text" name="username" th:value="${usr.getUsername()}">
+  <br/>
+<!--  <a th:text="${usr.getRole()}">role</a>-->
+  <br/>
+  <div th:each="role : ${roles}">
+
+    <label><input
+            type="checkbox"
+            name="role"
+            th:value="${role}"
+            th:checked="${role.getAuthority()}==${usr.getRole()}"/>
+    </label>
+    <a th:text="${role}">user</a>
+  </div>
+
+  <br/>
+  <input type="hidden" th:value="${usr.getId()}" name="id">
+<button type="submit">Сохранить изменения</button>
+</form>
+
+
+</body>
+</html>
