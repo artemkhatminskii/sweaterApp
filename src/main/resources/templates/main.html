@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Список сообщений</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
@@ -31,6 +32,11 @@
         <a th:text="${message.getTag()}">tag</a>
         <br/>
         <a th:text="${message.getAuthorName()}">author</a>
+
+        <div th:if="${message.getFilename() != null}">
+        <img th:src="@{/img/{filename}(filename=${message.getFilename()})}">
+            </div>
+
     </table>
 
     <hr/>

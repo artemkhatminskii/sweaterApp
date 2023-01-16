@@ -3,16 +3,27 @@ package com.example.sweaterApp.Controllers;
 import com.example.sweaterApp.Models.Message;
 import com.example.sweaterApp.Repository.MessageRepository;
 import com.example.sweaterApp.Repository.UsrRepository;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.Principal;
+import java.util.UUID;
 
 @Controller
 public class MessageController {
+
+    @Value("${upload.path}")
+    private String uploadPath;
 
     private final MessageRepository messageRepository;
     private final UsrRepository usrRepository;
@@ -49,7 +60,21 @@ public class MessageController {
     public String newMessage(
             Principal usr,
             @ModelAttribute("message") Message message,
-                             BindingResult bindingResult) {
+                             BindingResult bindingResult,
+            @RequestParam("file") MultipartFile file) throws IOException {
+
+        if (!file.isEmpty() && !file.getOriginalFilename().isEmpty()) {
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdir();
+            }
+            String uuidFile = UUID.randomUUID().toString();
+            String resultFilename = uuidFile + "." + file.getOriginalFilename();
+
+            file.transferTo(new File(uploadPath + "/" + resultFilename));
+
+            message.setFilename(resultFilename);
+        }
 
         if (bindingResult.hasErrors()) return "newMessage";
         message.setAuthor(usrRepository.findByUsername(usr.getName()));

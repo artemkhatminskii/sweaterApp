@@ -6,10 +6,13 @@
 </head>
 <body>
 
-<form th:method="POST" th:action="@{/new_message}" th:object="${message}">
+<form th:method="POST" th:action="@{/new_message}" th:object="${message}"
+  enctype="multipart/form-data">
   <label for="text" >Введите новое сообщение:</label>
   <br/>
   <input type="text" th:field="*{text}" id="text"/>
+
+  <input type="file" name="file" id="file"/>
 
   <br/>
   <label for="tag" >Тэг:</label>
