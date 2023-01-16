@@ -6,9 +6,9 @@
 </head>
 <body>
 
-<form th:method="POST" th:action="@{/filter}">
+<form th:method="GET" th:action="@{/main}">
     <label for="tag" >Укажите тэг:</label>
-    <input type="text" id="tag" name="tag"/>
+    <input type="text" id="tag" name="tag" th:value="${tag}">
     <br/>
     <input type="submit" value="Поиск">
 </form>
@@ -29,6 +29,8 @@
         <a th:text="${message.getText()}">text</a>
         <br/>
         <a th:text="${message.getTag()}">tag</a>
+        <br/>
+        <a th:text="${message.getAuthorName()}">author</a>
     </table>
 
     <hr/>
@@ -39,6 +41,8 @@
 <form th:action="@{/logout}" method="post">
     <input type="submit" value="Sign Out"/>
 </form>
+
+<a href="/user">Список пользователей</a>
 
 </body>
 </html>

@@ -6,6 +6,8 @@ import java.util.Set;
 @Entity
 @Table(name = "usr")
 public class Usr {
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

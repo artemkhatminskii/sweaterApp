@@ -24,4 +24,9 @@ public class UsrDetailsService implements UserDetailsService {
         if(usr.isEmpty()) throw new UsernameNotFoundException("User not found");
         return new UsrDetails(usr.get());
     }
+
+    public Usr findOne(Long id) {
+        Optional<Usr> usr = usrRepository.findById(id);
+        return usr.orElse(null);
+    }
 }
