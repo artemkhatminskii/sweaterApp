@@ -16,6 +16,9 @@ public class Usr {
     private boolean active;
     private String role;
 
+    private String email;
+    private String activationCode;
+
     public Long getId() {
         return id;
     }
@@ -54,5 +57,21 @@ public class Usr {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getActivationCode() {
+        return activationCode;
+    }
+
+    public void setActivationCode(String activationCode) {
+        this.activationCode = activationCode;
     }
 }
