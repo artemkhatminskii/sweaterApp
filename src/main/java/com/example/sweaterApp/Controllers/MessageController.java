@@ -51,6 +51,14 @@ public class MessageController {
         return "main";
     }
 
+
+    @GetMapping(value = "/img/{imageUrl}")
+    public @ResponseBody byte[] image(@PathVariable String imageUrl) throws IOException {
+        String url = "/home/artem/sweaterAppDir/" + imageUrl; //здесь указываете СВОЙ путь к папке с картинками
+        InputStream in = new FileInputStream(url);
+        return IOUtils.toByteArray(in);
+    }
+
     @GetMapping("/new_message")
     public String addMessage(@ModelAttribute("message") Message message) {
         return "newMessage";
