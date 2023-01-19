@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 @Service
@@ -28,5 +29,10 @@ public class UsrDetailsService implements UserDetailsService {
     public Usr findOne(Long id) {
         Optional<Usr> usr = usrRepository.findById(id);
         return usr.orElse(null);
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        usrRepository.deleteById(id);
     }
 }

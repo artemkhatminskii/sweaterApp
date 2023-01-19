@@ -31,11 +31,16 @@
                         <a class="nav-link" href="/user">User List</a>
                     </li>
                 </div>
+                <div sec:authorize="isAuthenticated()">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/profile">Настройки профиля</a>
+                    </li>
+                </div>
             </ul>
             <div >
                 Authenticated as <span class="navbar-text mr-3" sec:authentication="name"></span></div>
             <form th:action="@{/logout}" method="post">
-                <input type="submit" value="Sign Out"/>
+                <input type="submit" value="Выход"/>
             </form>
         </div>
     </nav>

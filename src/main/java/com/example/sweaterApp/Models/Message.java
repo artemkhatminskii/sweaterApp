@@ -1,14 +1,18 @@
 package com.example.sweaterApp.Models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import org.hibernate.validator.constraints.Length;
 
 @Entity
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
-
+    private Long id;
+    @NotEmpty(message = "Поле сообщения не должно быть пустым")
+    @Length(max = 2048, message = "Сообщение слишком длинное")
     private String text;
+    @NotEmpty(message = "Поле тэга не должно быть пустым")
     private String tag;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -53,11 +57,11 @@ public class Message {
         this.tag = tag;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

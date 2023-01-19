@@ -33,11 +33,16 @@
             <a class="nav-link" href="/user">User List</a>
           </li>
         </div>
+        <div sec:authorize="isAuthenticated()">
+          <li class="nav-item">
+            <a class="nav-link" href="/profile">Настройки профиля</a>
+          </li>
+        </div>
       </ul>
       <div >
         Authenticated as <span class="navbar-text mr-3" sec:authentication="name"></span></div>
       <form th:action="@{/logout}" method="post">
-        <input type="submit" value="Sign Out"/>
+        <input type="submit" value="Выход"/>
       </form>
     </div>
   </nav>
@@ -47,6 +52,9 @@
   </div>
   <div th:if="${param.logout}">
     Вы вышли из аккаунта.
+  </div>
+  <div th:if="${message != null}">
+    <p style="color:red" class="text mt-3" th:text="${message}" />
   </div>
 
   <form th:action="@{/login}" method="post">

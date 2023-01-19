@@ -32,11 +32,16 @@
             <a class="nav-link" href="/user">User List</a>
           </li>
         </div>
+        <div sec:authorize="isAuthenticated()">
+          <li class="nav-item">
+            <a class="nav-link" href="/profile">Настройки профиля</a>
+          </li>
+        </div>
       </ul>
       <div >
         Authenticated as <span class="navbar-text mr-3" sec:authentication="name"></span></div>
       <form th:action="@{/logout}" method="post">
-        <input type="submit" value="Sign Out"/>
+        <input type="submit" value="Выход"/>
       </form>
     </div>
   </nav>
@@ -46,24 +51,53 @@
   <div th:if="${param.logout}">
     Вы вышли из аккаунта.
   </div>
+  <div th:if="${existError != null}">
+    <p style="color:red" class="text mt-3" th:text="${existError}" />
+  </div>
 
   <form th:action="@{/registration}" method="post">
-    <div class="form-group row">
+    <div class="form-group row mt-3">
       <label class="col-sm-2 col-form-label">Имя пользователя :</label>
       <div class="col-sm-6">
         <input type="text" name="username" class="form-control" placeholder="Имя пользователя"/>
+        <td th:if="${usernameError != null}" />
+
+        <h5> <p style="color:red" class="text mt-3" th:text="${usernameError}" /></h5>
+
+        </td>
       </div>
     </div>
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">Пароль:</label>
       <div class="col-sm-6">
         <input type="password" name="password" class="form-control" placeholder="Пароль"/>
+        <td th:if="${passwordError != null}" />
+
+        <h5> <p style="color:red" class="text mt-3" th:text="${passwordError}" /></h5>
+
+        </td>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">Пароль:</label>
+      <div class="col-sm-6">
+        <input type="password" name="password2" class="form-control" placeholder="Повторите пароль"/>
+        <td th:if="${password2Error != null}" />
+
+        <h5> <p style="color:red" class="text mt-3" th:text="${password2Error}" /></h5>
+
+        </td>
       </div>
     </div>
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">Email:</label>
       <div class="col-sm-6">
         <input type="email" name="email" class="form-control" placeholder="some@some.com"/>
+        <td th:if="${emailError != null}" />
+
+        <h5> <p style="color:red" class="text mt-3" th:text="${emailError}" /></h5>
+
+        </td>
       </div>
     </div>
 

@@ -36,6 +36,11 @@ public class RegistrationService {
 
         usrRepository.save(usr);
 
+        sendMessage(usr);
+        return true;
+    }
+
+    private void sendMessage(Usr usr) {
         if (!StringUtils.isEmpty(usr.getEmail())) {
             String message = String.format(
                     "Hello, %s! \n" +
@@ -46,7 +51,6 @@ public class RegistrationService {
             );
             mailSenderService.send(usr.getEmail(), "Activation code", message);
         }
-        return true;
     }
 
     public boolean activateUser(String code) {
@@ -58,4 +62,30 @@ public class RegistrationService {
         usrRepository.save(usr);
         return true;
     }
+
+    public void updateProfile(Usr usr, String password, String email) {
+        String userEmail = usr.getEmail();
+
+        boolean isEmailChanged = (email != null && !email.equals(userEmail)) ||
+                (userEmail != null && !userEmail.equals(email));
+
+        if (isEmailChanged) {
+            usr.setEmail(email);
+
+            if (!StringUtils.isEmpty(email)) {
+                usr.setActivationCode(UUID.randomUUID().toString());
+            }
+        }
+
+        if (!StringUtils.isEmpty(password)) {
+            usr.setPassword(passwordEncoder.encode(password));
+        }
+
+        usrRepository.save(usr);
+
+        if (isEmailChanged) {
+            sendMessage(usr);
+        }
+    }
 }
+

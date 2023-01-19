@@ -3,12 +3,16 @@ package com.example.sweaterApp.Controllers;
 import com.example.sweaterApp.Models.Usr;
 import com.example.sweaterApp.Repository.UsrRepository;
 import com.example.sweaterApp.Services.RegistrationService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import java.util.Map;
 
 @Controller
 public class RegistrationController {
@@ -28,9 +32,19 @@ public class RegistrationController {
     }
 
     @PostMapping("/registration")
-    public String addUsr(Usr usr, Model model) {
+    public String addUsr(@Valid Usr usr, BindingResult bindingResult, Model model) {
+        if (usr.getPassword() != null && !usr.getPassword().equals(usr.getPassword2())) {
+            model.addAttribute("passwordError", "Пароли не совпадают!");
+        }
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = ControllerUtils.getErrors(bindingResult);
+
+            model.mergeAttributes(errors);
+            return "registration";
+        }
         if (!registrationService.register(usr)) {
-            model.addAttribute("message", "User exist!");
+            model.addAttribute("existError", "User exist!");
+            return "registration";
         }
 
         return "redirect:/login";

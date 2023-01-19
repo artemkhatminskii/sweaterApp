@@ -32,11 +32,16 @@
             <a class="nav-link" href="/user">User List</a>
           </li>
         </div>
+        <div sec:authorize="isAuthenticated()">
+          <li class="nav-item">
+            <a class="nav-link" href="/profile">Настройки профиля</a>
+          </li>
+        </div>
       </ul>
       <div >
         Authenticated as <span class="navbar-text mr-3" sec:authentication="name"></span></div>
       <form th:action="@{/logout}" method="post">
-        <input type="submit" value="Sign Out"/>
+        <input type="submit" value="Выход"/>
       </form>
     </div>
   </nav>
@@ -45,12 +50,26 @@
     <form th:method="POST" th:action="@{/new_message}" th:object="${message}"
           enctype="multipart/form-data">
       <div class="form-group">
+
         <input type="text" th:field="*{text}" id="text"
-               class="form-control" placeholder="Введите сообщение"/>
+               class="form-control"
+               placeholder="Введите сообщение"
+               th:if="${message != null}" th:value="${text}"/>
+        <td th:if="${textError != null}" />
+
+          <h5> <p style="color:red" class="text mt-3" th:text="${textError}" /></h5>
+
+        </td>
       </div>
       <div class="form-group">
         <input type="text" th:field="*{tag}" id="tag"
-               class="form-control" placeholder="Тэг:"/>
+               class="form-control" placeholder="Тэг:"
+               th:if="${message != null}" th:value="${tag}"/>
+        <td th:if="${tagError != null}" />
+
+        <h5> <p style="color:red" class="text mt-3" th:text="${tagError}" /></h5>
+
+        </td>
       </div>
 
       <div class="form-group">
