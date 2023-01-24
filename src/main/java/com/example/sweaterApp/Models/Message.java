@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import org.hibernate.validator.constraints.Length;
 
+import java.io.Serializable;
+
 @Entity
-public class Message {
+public class Message implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -32,6 +34,9 @@ public class Message {
 
     public String getAuthorName() {
         return author != null ? author.getUsername() : "<none>";
+    }
+    public Long getAuthorId() {
+        return author != null ? author.getId() : -1;
     }
     public Usr getAuthor() {
         return author;

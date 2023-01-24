@@ -27,6 +27,11 @@
         <li class="nav-item">
           <a class="nav-link" href="/main">Сообщения</a>
         </li>
+        <div sec:authorize="isAuthenticated()">
+          <li class="nav-item">
+            <a class="nav-link" href="/user_messages">Мои сообщения</a>
+          </li>
+        </div>
         <div sec:authorize="hasRole('ROLE_ADMIN')">
           <li class="nav-item">
             <a class="nav-link" href="/user">User List</a>
@@ -40,7 +45,7 @@
       </ul>
       <div >
         Authenticated as <span class="navbar-text mr-3" sec:authentication="name"></span></div>
-      <form th:action="@{/logout}" method="post">
+      <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post">
         <input type="submit" value="Выход"/>
       </form>
     </div>

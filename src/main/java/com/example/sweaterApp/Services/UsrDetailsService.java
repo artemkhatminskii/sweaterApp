@@ -3,6 +3,7 @@ package com.example.sweaterApp.Services;
 import com.example.sweaterApp.Models.Usr;
 import com.example.sweaterApp.Repository.UsrRepository;
 import com.example.sweaterApp.Security.UsrDetails;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -34,5 +35,25 @@ public class UsrDetailsService implements UserDetailsService {
     @Transactional
     public void delete(Long id) {
         usrRepository.deleteById(id);
+    }
+
+
+    public Usr getUsrById(Long id) {
+        Optional<Usr> foundUsr = usrRepository.findById(id);
+
+        if (foundUsr.isPresent()) {
+            Hibernate.initialize(foundUsr.get());
+        }
+        return foundUsr.get();
+    }
+
+    public void subscribe(Usr currentUsr, Usr usr) {
+        usr.getSubscribers().add(currentUsr);
+        usrRepository.save(usr);
+    }
+
+    public void unsubscribe(Usr currentUsr, Usr usr) {
+        usr.getSubscribers().remove(currentUsr);
+        usrRepository.save(usr);
     }
 }

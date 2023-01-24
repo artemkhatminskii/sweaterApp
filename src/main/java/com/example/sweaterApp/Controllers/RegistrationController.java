@@ -7,8 +7,10 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -32,11 +34,18 @@ public class RegistrationController {
     }
 
     @PostMapping("/registration")
-    public String addUsr(@Valid Usr usr, BindingResult bindingResult, Model model) {
+    public String addUsr(@Valid Usr usr,
+                         BindingResult bindingResult,
+                         Model model) {
+        boolean isConfirmEmpty = StringUtils.isEmpty(usr.getPassword2());
+
+        if (isConfirmEmpty) {
+            model.addAttribute("password2Error", "Повторно введите пароль");
+        }
         if (usr.getPassword() != null && !usr.getPassword().equals(usr.getPassword2())) {
             model.addAttribute("passwordError", "Пароли не совпадают!");
         }
-        if (bindingResult.hasErrors()) {
+        if (isConfirmEmpty || bindingResult.hasErrors()) {
             Map<String, String> errors = ControllerUtils.getErrors(bindingResult);
 
             model.mergeAttributes(errors);
@@ -55,8 +64,10 @@ public class RegistrationController {
         boolean isActivated = registrationService.activateUser(code);
 
         if (isActivated) {
+            model.addAttribute("messageType", "success");
             model.addAttribute("message", "User successfully activated!");
         } else {
+            model.addAttribute("messageType", "danger");
             model.addAttribute("message", "Activation code is not found");
         }
         return "login";

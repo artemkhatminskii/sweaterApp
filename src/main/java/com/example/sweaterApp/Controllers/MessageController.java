@@ -1,14 +1,19 @@
 package com.example.sweaterApp.Controllers;
 
 import com.example.sweaterApp.Models.Message;
+import com.example.sweaterApp.Models.Usr;
 import com.example.sweaterApp.Repository.MessageRepository;
 import com.example.sweaterApp.Repository.UsrRepository;
+import com.example.sweaterApp.Security.UsrDetails;
+import com.example.sweaterApp.Services.UsrDetailsService;
 import jakarta.validation.Valid;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,9 +24,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.Set;
 
 @Controller
+
 public class MessageController {
 
     @Value("${upload.path}")
@@ -29,11 +37,13 @@ public class MessageController {
 
     private final MessageRepository messageRepository;
     private final UsrRepository usrRepository;
+    private final UsrDetailsService usrDetailsService;
 
     @Autowired
-    public MessageController(MessageRepository messageRepository, UsrRepository usrRepository) {
+    public MessageController(MessageRepository messageRepository, UsrRepository usrRepository, UsrDetailsService usrDetailsService) {
         this.messageRepository = messageRepository;
         this.usrRepository = usrRepository;
+        this.usrDetailsService = usrDetailsService;
     }
 
 
@@ -43,14 +53,91 @@ public class MessageController {
     }
 
     @GetMapping("/main")
-    public String main(@RequestParam(value = "tag", required = false, defaultValue = "") String tag,
+    public String main(@AuthenticationPrincipal UsrDetails usr,
+            @RequestParam(value = "filter", required = false, defaultValue = "") String filter,
                        Model model) {
-        if (tag != null && !tag.isBlank())
-            model.addAttribute("messages", messageRepository.findByTag(tag));
+        if (filter != null && !filter.isBlank())
+            model.addAttribute("messages", messageRepository.findByTag(filter));
         else
         model.addAttribute("messages", messageRepository.findAll());
-        model.addAttribute("tag", tag);
+        model.addAttribute("filter", filter);
+        model.addAttribute("usr", usr.getUsr());
         return "main";
+    }
+
+
+    @GetMapping("/user_messages")
+    public String userMessages(Model model,
+                               @AuthenticationPrincipal UsrDetails usr) {
+
+        Set<Message> messageSet = messageRepository.findByAuthor(Optional.ofNullable(usr.getUsr()));
+        Usr getUsr = usrRepository.findByUsername(usr.getUsername());
+        model.addAttribute("usr", usr.getUsr());
+        model.addAttribute("messages", messageSet);
+        model.addAttribute("isCurrentUsr", true);
+        model.addAttribute("subscriptionsCount", getUsr.getSubscriptions().size());
+        model.addAttribute("subscribersCount", getUsr.getSubscribers().size());
+        model.addAttribute("isSubscriber", getUsr.getSubscribers().contains(usr.getUsr()));
+        return "userMessages";
+    }
+    @GetMapping("/user_messages/{id}")
+    public String userMessages(@PathVariable(required = false) Long id,
+                               Model model,
+                               @AuthenticationPrincipal UsrDetails usr,
+                               @RequestParam(required = false) Message message) {
+        Set<Message> messageSet = messageRepository.findByAuthor(usrRepository.findById(id));
+        Usr getUsr = usrDetailsService.getUsrById(id);
+        Usr currentUsr = usrRepository.findByUsername(usr.getUsername());
+        boolean isSubscriber = false;
+        if (currentUsr.getSubscriptions().contains(getUsr)) isSubscriber=true;
+
+        model.addAttribute("message", message);
+        model.addAttribute("messages", messageSet);
+        model.addAttribute("usr", getUsr);
+        model.addAttribute("isCurrentUsr", usr.getUsr().getId().equals(id));
+        model.addAttribute("subscriptionsCount", getUsr.getSubscriptions().size());
+        model.addAttribute("subscribersCount", getUsr.getSubscribers().size());
+        model.addAttribute("isSubscriber", isSubscriber);
+
+
+        return "userMessages";
+    }
+
+    @PostMapping("/user_messages/{id}")
+    public String updateMessage(
+            @AuthenticationPrincipal UsrDetails currentUser,
+            @PathVariable(required = false) Long id,
+            @RequestParam("text") String text,
+            @RequestParam("tag") String tag,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(required = false) Message message
+            ) throws IOException {
+        if (message.getAuthor().getId().equals(currentUser.getUsr().getId())) {
+            if (!StringUtils.isEmpty(text)) {
+                message.setText(text);
+            }
+
+            if (!StringUtils.isEmpty(tag)) {
+                message.setTag(tag);
+            }
+
+            if (!file.isEmpty() && !file.getOriginalFilename().isEmpty()) {
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdir();
+                }
+                String uuidFile = UUID.randomUUID().toString();
+                String resultFilename = uuidFile + "." + file.getOriginalFilename();
+
+                file.transferTo(new File(uploadPath + "/" + resultFilename));
+
+                message.setFilename(resultFilename);
+            }
+
+            messageRepository.save(message);
+        }
+
+        return "redirect:/user_messages/" + message.getAuthorId();
     }
 
 
