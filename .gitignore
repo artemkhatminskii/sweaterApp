@@ -32,4 +32,4 @@ build/
 ### VS Code ###
 .vscode/
 
-**/src/main/resources/application.properties
+/home/artem/Документы/IDEA_Projects/sweaterApp/src/main/resources/application.properties
