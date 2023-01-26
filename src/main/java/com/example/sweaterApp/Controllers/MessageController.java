@@ -10,6 +10,10 @@ import jakarta.validation.Valid;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,8 +29,8 @@ import java.io.InputStream;
 import java.security.Principal;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.Set;
+import java.util.UUID;
 
 @Controller
 
@@ -54,12 +58,15 @@ public class MessageController {
 
     @GetMapping("/main")
     public String main(@AuthenticationPrincipal UsrDetails usr,
-            @RequestParam(value = "filter", required = false, defaultValue = "") String filter,
-                       Model model) {
+                       @RequestParam(value = "filter", required = false, defaultValue = "") String filter,
+                       Model model,
+                       @PageableDefault(sort = { "id" }, direction = Sort.Direction.DESC)Pageable pageable) {
         if (filter != null && !filter.isBlank())
-            model.addAttribute("messages", messageRepository.findByTag(filter));
+            model.addAttribute("messages", messageRepository.findByTag(filter, pageable));
         else
-        model.addAttribute("messages", messageRepository.findAll());
+        model.addAttribute("messages", messageRepository.findAll(pageable));
+        Page<Message> page = messageRepository.findAll(pageable);
+        page.getSize();
         model.addAttribute("filter", filter);
         model.addAttribute("usr", usr.getUsr());
         return "main";
@@ -68,9 +75,10 @@ public class MessageController {
 
     @GetMapping("/user_messages")
     public String userMessages(Model model,
-                               @AuthenticationPrincipal UsrDetails usr) {
+                               @AuthenticationPrincipal UsrDetails usr,
+                               @PageableDefault(sort = { "id" }, direction = Sort.Direction.DESC)Pageable pageable) {
 
-        Set<Message> messageSet = messageRepository.findByAuthor(Optional.ofNullable(usr.getUsr()));
+        Page<Message> messageSet = messageRepository.findByAuthor(Optional.ofNullable(usr.getUsr()), pageable);
         Usr getUsr = usrRepository.findByUsername(usr.getUsername());
         model.addAttribute("usr", usr.getUsr());
         model.addAttribute("messages", messageSet);
@@ -84,14 +92,16 @@ public class MessageController {
     public String userMessages(@PathVariable(required = false) Long id,
                                Model model,
                                @AuthenticationPrincipal UsrDetails usr,
-                               @RequestParam(required = false) Message message) {
-        Set<Message> messageSet = messageRepository.findByAuthor(usrRepository.findById(id));
+                               @RequestParam(required = false) Message message,
+                               @PageableDefault(sort = { "id" }, direction = Sort.Direction.DESC)Pageable pageable) {
+        Page<Message> messageSet = messageRepository.findByAuthor(usrRepository.findById(id), pageable);
         Usr getUsr = usrDetailsService.getUsrById(id);
         Usr currentUsr = usrRepository.findByUsername(usr.getUsername());
         boolean isSubscriber = false;
         if (currentUsr.getSubscriptions().contains(getUsr)) isSubscriber=true;
 
         model.addAttribute("message", message);
+        model.addAttribute("id", id);
         model.addAttribute("messages", messageSet);
         model.addAttribute("usr", getUsr);
         model.addAttribute("isCurrentUsr", usr.getUsr().getId().equals(id));

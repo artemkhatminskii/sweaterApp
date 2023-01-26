@@ -94,7 +94,7 @@
 
 
   <div class="form-group mt-3">
-    <a href="/new_message" th:text="'Добавить новое сообщение!'"></a>
+    <a href="/new_message" th:text="'Добавить новое сообщение'"></a>
   </div>
 
   <div th:if="${message != null}">
@@ -144,6 +144,132 @@
       <hr/>
       <p>Человек пока ничего не написал</p>
       <hr/>
+    </div>
+
+    <div th:if="${id != null}">
+      <nav aria-label="Pagination" th:if="${messages.totalPages gt 0}">
+
+        <ul class="pagination justify-content-center font-weight-medium">
+          <li class="page-item" th:classappend="${messages.number eq 0} ? 'disabled'">
+            <a class="page-link svg-icon"
+               th:href="@{/user_messages/{id}(id=${id}, page=${messages.number lt 2 ? 0 : messages.number - 1}, size=${messages.getSize()})}"
+               aria-label="Previous" title="Предыдущая страница" rel="tooltip">
+              <span aria-hidden="true" data-feather="chevrons-left" width="20" height="20">&laquo;</span>
+            </a>
+          </li>
+          <li class="page-item" th:if="${messages.number > 0}" th:classappend="${messages.number eq 0} ? 'active'" >
+            <a class="page-link" th:href="@{/user_messages/{id}(id=${id}, page=${0}, size=${messages.getSize()})}" th:text="${1}"
+               th:title="${'Страница 1'}" rel="tooltip"></a>
+          </li>
+          <li class="page-item disabled" th:if="${messages.number > 1}">
+            <a class="page-link svg-icon" href="#" th:text="...">
+              <span data-feather="more-horizontal" width="20" height="20"></span>
+            </a>
+          </li>
+          <li class="page-item" th:classappend="${i eq messages.number + 1} ? 'active'"
+              th:each="i : ${#numbers.sequence( messages.number + 1, messages.totalPages > 3 + messages.number ? messages.number + 3 : messages.totalPages, 1)}">
+            <a class="page-link" th:href="@{/user_messages/{id}(id=${id}, page=${i - 1}, size=${messages.getSize()})}" th:text="${i}"
+               th:title="${'Страница '+ i}" rel="tooltip"></a>
+          </li>
+          <li class="page-item disabled" th:if="${messages.number + 3 < messages.totalPages}">
+            <a class="page-link svg-icon" href="#" th:text="...">
+              <span data-feather="more-horizontal" width="20" height="20"></span>
+            </a>
+          </li>
+          <li class="page-item" th:if="${messages.number < messages.totalPages - 3}" th:classappend="${i eq messages.totalPages} ? 'active'" >
+            <a class="page-link" th:href="@{/user_messages/{id}(id=${id}, page=${messages.totalPages - 1}, size=${messages.getSize()})}" th:text="${messages.totalPages}"
+               th:title="${'Страница '+ messages.totalPages}" rel="tooltip"></a>
+          </li>
+          <li class="page-item" th:classappend="${messages.number + 1 eq messages.totalPages} ? 'disabled'">
+            <a class="page-link svg-icon"
+               th:href="@{/user_messages/{id}(id=${id}, page=${messages.number + 1}, size=${messages.getSize()})}"
+               aria-label="Next" title="Следующая страница" rel="tooltip">
+              <span aria-hidden="true" data-feather="chevrons-right" width="20" height="20">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+
+        <ul class="pagination justify-content-end">
+          <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1">Элементов на странице</a>
+          </li>
+          <div th:each="s : ${ {1, 5, 10, 15} }">
+            <div th:if="${s == messages.getSize()}">
+              <li class="page-item active">
+                <a class="page-link" href="#" tabindex="-1" th:text="${s}"></a>
+              </li>
+            </div>
+            <div th:if="${s != messages.getSize()}">
+              <li class="page-item">
+                <a class="page-link" th:href="@{/user_messages/{id}(id=${id}, page=${messages.number}, size=${s})}" tabindex="-1" th:text="${s}"></a>
+              </li>
+            </div>
+          </div>
+        </ul>
+      </nav>
+    </div>
+
+    <div th:if="${id == null}">
+      <nav aria-label="Pagination" th:if="${messages.totalPages gt 0}">
+
+        <ul class="pagination justify-content-center font-weight-medium">
+          <li class="page-item" th:classappend="${messages.number eq 0} ? 'disabled'">
+            <a class="page-link svg-icon"
+               th:href="@{/user_messages(page=${messages.number lt 2 ? 0 : messages.number - 1}, size=${messages.getSize()})}"
+               aria-label="Previous" title="Предыдущая страница" rel="tooltip">
+              <span aria-hidden="true" data-feather="chevrons-left" width="20" height="20">&laquo;</span>
+            </a>
+          </li>
+          <li class="page-item" th:if="${messages.number > 0}" th:classappend="${messages.number eq 0} ? 'active'" >
+            <a class="page-link" th:href="@{/user_messages(page=${0}, size=${messages.getSize()})}" th:text="${1}"
+               th:title="${'Страница 1'}" rel="tooltip"></a>
+          </li>
+          <li class="page-item disabled" th:if="${messages.number > 1}">
+            <a class="page-link svg-icon" href="#" th:text="...">
+              <span data-feather="more-horizontal" width="20" height="20"></span>
+            </a>
+          </li>
+          <li class="page-item" th:classappend="${i eq messages.number + 1} ? 'active'"
+              th:each="i : ${#numbers.sequence( messages.number + 1, messages.totalPages > 3 + messages.number ? messages.number + 3 : messages.totalPages, 1)}">
+            <a class="page-link" th:href="@{/user_messages(page=${i - 1}, size=${messages.getSize()})}" th:text="${i}"
+               th:title="${'Страница '+ i}" rel="tooltip"></a>
+          </li>
+          <li class="page-item disabled" th:if="${messages.number + 3 < messages.totalPages}">
+            <a class="page-link svg-icon" href="#" th:text="...">
+              <span data-feather="more-horizontal" width="20" height="20"></span>
+            </a>
+          </li>
+          <li class="page-item" th:if="${messages.number < messages.totalPages - 3}" th:classappend="${i eq messages.totalPages} ? 'active'" >
+            <a class="page-link" th:href="@{/user_messages(page=${messages.totalPages - 1}, size=${messages.getSize()})}" th:text="${messages.totalPages}"
+               th:title="${'Страница '+ messages.totalPages}" rel="tooltip"></a>
+          </li>
+          <li class="page-item" th:classappend="${messages.number + 1 eq messages.totalPages} ? 'disabled'">
+            <a class="page-link svg-icon"
+               th:href="@{/user_messages(page=${messages.number + 1}, size=${messages.getSize()})}"
+               aria-label="Next" title="Следующая страница" rel="tooltip">
+              <span aria-hidden="true" data-feather="chevrons-right" width="20" height="20">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+
+        <ul class="pagination justify-content-end">
+          <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1">Элементов на странице</a>
+          </li>
+          <div th:each="s : ${ {1, 5, 10, 15} }">
+            <div th:if="${s == messages.getSize()}">
+              <li class="page-item active">
+                <a class="page-link" href="#" tabindex="-1" th:text="${s}"></a>
+              </li>
+            </div>
+            <div th:if="${s != messages.getSize()}">
+              <li class="page-item">
+                <a class="page-link" th:href="@{/user_messages(page=${messages.number}, size=${s})}" tabindex="-1" th:text="${s}"></a>
+              </li>
+            </div>
+          </div>
+        </ul>
+      </nav>
     </div>
 
     <div th:if="${!messages.isEmpty()}">
