@@ -145,17 +145,21 @@
                         <br/>
                         <a th:text="'#' + ${message.getTag()}">tag</a>
                     </div>
-                    <div class="card-footer text-muted">
+                    <div class="card-footer text-muted container">
+                        <div class="row">
+                            <a class="col align-self-center"
+                               th:href="@{/user_messages/{id}(id=${message.getAuthorId()})}"
+                               th:text="${message.getAuthorName()}"></a>
 
-                        <a th:href="@{/user_messages/{id}(id=${message.getAuthorId()})}"
-                           th:text="${message.getAuthorName()}"></a>
 
-
-                        <div th:if="${message.getAuthorName()} == ${usr.getUsername()}">
-                            <a class="btn btn-primary" th:href="@{/user_messages/{id}(id=${message.getAuthorId()}, message=${message.getId()})}">
-                                Редактировать
-                            </a>
+                            <div th:if="${message.getAuthorName()} == ${usr.getUsername()}">
+                                <a class="col btn btn-primary" th:href="@{/user_messages/{id}(id=${message.getAuthorId()}, message=${message.getId()})}">
+                                    Редактировать
+                                </a>
+                            </div>
                         </div>
+
+
 
 
                     </div>
